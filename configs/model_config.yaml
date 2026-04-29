@@ -34,16 +34,16 @@ training:
   test_size: 0.2
   validation_size: 0.1
   random_state: 42
-  cv_folds: 5
+  cv_folds: 3          # reduced from 5 to save memory on Render
   early_stopping_rounds: 20
-  use_smote: false  # Disable SMOTE - let model learn natural distribution
-  scale_features: true  # Feature scaling
+  use_smote: false
+  scale_features: true
 
-# XGBoost Parameters (Final Balanced)
+# XGBoost Parameters (Render-optimised – lighter to fit free tier RAM)
 xgboost:
-  max_depth: 6
+  max_depth: 5
   learning_rate: 0.1
-  n_estimators: 200
+  n_estimators: 150    # reduced from 200
   subsample: 0.8
   colsample_bytree: 0.8
   min_child_weight: 1
@@ -52,7 +52,8 @@ xgboost:
   reg_lambda: 1
   objective: "binary:logistic"
   eval_metric: "auc"
-  scale_pos_weight: 3.23  # 11458/3542 = 3.23 to balance classes
+  scale_pos_weight: 3.23
+  n_jobs: 1            # single thread – avoids OOM on free tier
 
 # Fairness
 fairness:

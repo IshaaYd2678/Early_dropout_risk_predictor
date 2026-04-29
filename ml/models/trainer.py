@@ -128,7 +128,7 @@ class ModelTrainer:
                 objective=self.config['xgboost']['objective'],
                 eval_metric=self.config['xgboost']['eval_metric'],
                 random_state=random_state,
-                n_jobs=-1
+                n_jobs=self.config['xgboost'].get('n_jobs', -1)
             )
         elif self.model_type == 'logistic_regression':
             self.model = LogisticRegression(

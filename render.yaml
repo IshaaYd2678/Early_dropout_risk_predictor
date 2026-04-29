@@ -1,0 +1,139 @@
+##############################################################################
+# Render Blueprint – Early Warning System for Student Dropout Risk
+#
+# Services deployed:
+#   1. api          – FastAPI backend  (Python, Web Service)
+#   2. dashboard    – Streamlit dashboard  (Python, Web Service)
+#   3. db           – PostgreSQL  (Managed Database)
+#
+# How to deploy:
+#   1. Push this file to your GitHub repo root.
+#   2. Go to https://dashboard.render.com → New → Blueprint
+#   3. Connect your repo and Render will read this file automatically.
+#   4. Set the secret env vars marked with `sync: false` in the Render UI.
+##############################################################################
+
+databases:
+  - name: ews-postgres
+    databaseName: ews_production
+    user: ews_user
+    plan: free          # upgrade to starter/standard for production
+    region: oregon
+
+services:
+
+  # ── 1. FastAPI Backend ────────────────────────────────────────────────────
+  - type: web
+    name: ews-api
+    runtime: python
+    region: oregon
+    plan: free           # upgrade to starter for always-on
+    branch: main
+
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+      bash scripts/render_build.sh
+
+    startCommand: >
+      gunicorn src.production_main:app
+      --workers 2
+      --worker-class uvicorn.workers.UvicornWorker
+      --bind 0.0.0.0:$PORT
+      --timeout 120
+      --graceful-timeout 30
+      --access-logfile -
+      --error-logfile -
+
+    healthCheckPath: /health
+
+    envVars:
+      - key: APP_NAME
+        value: "Early Warning System"
+      - key: APP_ENV
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: LOG_LEVEL
+        value: INFO
+      - key: API_WORKERS
+        value: "2"
+
+      # Database – auto-injected from the managed DB above
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ews-postgres
+          property: connectionString
+
+      # Secrets – set these in the Render dashboard (not stored in git)
+      - key: SECRET_KEY
+        generateValue: true   # Render generates a random value
+      - key: JWT_SECRET_KEY
+        generateValue: true
+
+      # CORS – update after you know your dashboard URL
+      - key: CORS_ORIGINS
+        value: '["https://ews-dashboard.onrender.com","https://ews-api.onrender.com"]'
+
+      # ML / Feature flags
+      - key: ENABLE_PREDICTIONS
+        value: "true"
+      - key: ENABLE_INTERVENTIONS
+        value: "true"
+      - key: ENABLE_ANALYTICS
+        value: "true"
+      - key: ENABLE_FAIRNESS_MONITORING
+        value: "true"
+
+      # Logging
+      - key: LOG_FILE
+        value: "logs/production.log"
+      - key: LOG_MAX_BYTES
+        value: "10485760"
+      - key: LOG_BACKUP_COUNT
+        value: "5"
+
+      # Rate limiting
+      - key: RATE_LIMIT_ENABLED
+        value: "true"
+      - key: RATE_LIMIT_PER_MINUTE
+        value: "60"
+
+      # Prometheus
+      - key: PROMETHEUS_ENABLED
+        value: "false"
+
+      # Sentry (optional – paste your DSN in the Render dashboard)
+      - key: SENTRY_DSN
+        sync: false   # set manually in Render UI
+
+  # ── 2. Streamlit Dashboard ────────────────────────────────────────────────
+  - type: web
+    name: ews-dashboard
+    runtime: python
+    region: oregon
+    plan: free
+    branch: main
+
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+
+    startCommand: >
+      python -m streamlit run dashboard/enhanced_working_app.py
+      --server.port $PORT
+      --server.address 0.0.0.0
+      --server.headless true
+      --server.enableCORS false
+      --server.enableXsrfProtection false
+
+    healthCheckPath: /
+
+    envVars:
+      - key: API_BASE_URL
+        fromService:
+          name: ews-api
+          type: web
+          property: host
+      - key: STREAMLIT_SERVER_ENABLE_STATIC_SERVING
+        value: "true"

@@ -5,6 +5,7 @@ from pydantic_settings import BaseSettings
 from pydantic import Field, validator
 from typing import List, Optional
 import secrets
+import os
 from pathlib import Path
 
 
@@ -19,8 +20,8 @@ class Settings(BaseSettings):
     
     # API
     api_host: str = Field(default="0.0.0.0", env="API_HOST")
-    api_port: int = Field(default=8000, env="API_PORT")
-    api_workers: int = Field(default=4, env="API_WORKERS")
+    api_port: int = Field(default=int(os.environ.get("PORT", 8000)), env="API_PORT")
+    api_workers: int = Field(default=2, env="API_WORKERS")
     api_reload: bool = Field(default=False, env="API_RELOAD")
     
     # Database
@@ -115,8 +116,11 @@ class Settings(BaseSettings):
         return v
     
     def ensure_directories(self):
-        """Create necessary directories."""
-        self.log_file.parent.mkdir(parents=True, exist_ok=True)
+        """Create necessary directories, fall back to /tmp on read-only filesystems."""
+        try:
+            self.log_file.parent.mkdir(parents=True, exist_ok=True)
+        except OSError:
+            self.log_file = Path("/tmp/production.log")
         self.model_path.parent.mkdir(parents=True, exist_ok=True)
     
     class Config:

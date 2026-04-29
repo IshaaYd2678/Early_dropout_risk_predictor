@@ -1,0 +1,268 @@
+// Mock data for development and demo purposes
+import { Student, DashboardMetrics, TimeSeriesData, Intervention } from '../types';
+
+export const mockDashboardMetrics: DashboardMetrics = {
+  total_students: 1247,
+  at_risk_students: 186,
+  active_interventions: 42,
+  success_rate: 73.2,
+  risk_distribution: {
+    low: 847,
+    medium: 214,
+    high: 134,
+    critical: 52,
+  },
+  trends: {
+    risk_trend: -2.3,
+    intervention_trend: 8.7,
+    success_trend: 4.1,
+  },
+};
+
+export const mockRiskTrends: TimeSeriesData[] = [
+  { date: '2024-01-01', value: 28.5 },
+  { date: '2024-01-08', value: 29.2 },
+  { date: '2024-01-15', value: 27.8 },
+  { date: '2024-01-22', value: 26.4 },
+  { date: '2024-01-29', value: 25.9 },
+  { date: '2024-02-05', value: 24.7 },
+  { date: '2024-02-12', value: 23.8 },
+  { date: '2024-02-19', value: 22.9 },
+  { date: '2024-02-26', value: 21.5 },
+  { date: '2024-03-05', value: 20.8 },
+];
+
+export const mockHighRiskStudents: Student[] = [
+  {
+    id: '1',
+    student_id: 'STU00001',
+    first_name: 'Alex',
+    last_name: 'Johnson',
+    email: 'alex.johnson@university.edu',
+    department: 'Computer Science',
+    program: 'Bachelor of Science',
+    semester: 6,
+    year: 3,
+    enrollment_date: '2022-09-01',
+    status: 'active',
+    mentor_id: 'mentor-1',
+    current_risk_score: 87,
+    risk_category: 'Critical',
+    last_prediction_date: '2024-02-03T10:30:00Z',
+    demographics: {
+      gender: 'Male',
+      age: 21,
+      socioeconomic_status: 'Medium',
+      region: 'Urban',
+    },
+    academic_metrics: {
+      gpa: 2.1,
+      attendance_rate: 0.65,
+      assignment_submission_rate: 0.72,
+      exam_scores: 68,
+      participation_score: 45,
+    },
+    engagement_metrics: {
+      lms_login_frequency: 3,
+      forum_posts: 1,
+      resource_access_count: 8,
+      time_spent_hours: 4.2,
+      late_submissions: 7,
+    },
+  },
+  {
+    id: '2',
+    student_id: 'STU00002',
+    first_name: 'Maria',
+    last_name: 'Garcia',
+    email: 'maria.garcia@university.edu',
+    department: 'Engineering',
+    program: 'Bachelor of Engineering',
+    semester: 4,
+    year: 2,
+    enrollment_date: '2023-09-01',
+    status: 'active',
+    mentor_id: 'mentor-1',
+    current_risk_score: 76,
+    risk_category: 'High',
+    last_prediction_date: '2024-02-03T10:30:00Z',
+    demographics: {
+      gender: 'Female',
+      age: 20,
+      socioeconomic_status: 'Low',
+      region: 'Rural',
+    },
+    academic_metrics: {
+      gpa: 2.4,
+      attendance_rate: 0.78,
+      assignment_submission_rate: 0.68,
+      exam_scores: 72,
+      participation_score: 58,
+    },
+    engagement_metrics: {
+      lms_login_frequency: 5,
+      forum_posts: 3,
+      resource_access_count: 12,
+      time_spent_hours: 6.8,
+      late_submissions: 4,
+    },
+  },
+  {
+    id: '3',
+    student_id: 'STU00003',
+    first_name: 'David',
+    last_name: 'Chen',
+    email: 'david.chen@university.edu',
+    department: 'Business',
+    program: 'Bachelor of Business Administration',
+    semester: 2,
+    year: 1,
+    enrollment_date: '2024-01-15',
+    status: 'active',
+    mentor_id: 'mentor-2',
+    current_risk_score: 82,
+    risk_category: 'Critical',
+    last_prediction_date: '2024-02-03T10:30:00Z',
+    demographics: {
+      gender: 'Male',
+      age: 19,
+      socioeconomic_status: 'High',
+      region: 'Suburban',
+    },
+    academic_metrics: {
+      gpa: 1.9,
+      attendance_rate: 0.58,
+      assignment_submission_rate: 0.61,
+      exam_scores: 62,
+      participation_score: 38,
+    },
+    engagement_metrics: {
+      lms_login_frequency: 2,
+      forum_posts: 0,
+      resource_access_count: 5,
+      time_spent_hours: 2.1,
+      late_submissions: 9,
+    },
+  },
+  {
+    id: '4',
+    student_id: 'STU00004',
+    first_name: 'Sarah',
+    last_name: 'Williams',
+    email: 'sarah.williams@university.edu',
+    department: 'Arts',
+    program: 'Bachelor of Arts',
+    semester: 8,
+    year: 4,
+    enrollment_date: '2021-09-01',
+    status: 'active',
+    mentor_id: 'mentor-3',
+    current_risk_score: 71,
+    risk_category: 'High',
+    last_prediction_date: '2024-02-03T10:30:00Z',
+    demographics: {
+      gender: 'Female',
+      age: 22,
+      socioeconomic_status: 'Medium',
+      region: 'Urban',
+    },
+    academic_metrics: {
+      gpa: 2.6,
+      attendance_rate: 0.82,
+      assignment_submission_rate: 0.75,
+      exam_scores: 74,
+      participation_score: 62,
+    },
+    engagement_metrics: {
+      lms_login_frequency: 6,
+      forum_posts: 4,
+      resource_access_count: 15,
+      time_spent_hours: 8.3,
+      late_submissions: 3,
+    },
+  },
+];
+
+export const mockInterventions: Intervention[] = [
+  {
+    id: '1',
+    student_id: '1',
+    type: 'counseling',
+    title: 'Academic Support Session',
+    description: 'One-on-one counseling session to address academic challenges and develop study strategies.',
+    status: 'active',
+    priority: 'high',
+    assigned_to: 'counselor-1',
+    created_by: 'mentor-1',
+    created_date: '2024-02-01T09:00:00Z',
+    due_date: '2024-02-15T17:00:00Z',
+    notes: [
+      {
+        id: '1',
+        content: 'Student shows signs of stress and anxiety about upcoming exams.',
+        created_by: 'mentor-1',
+        created_date: '2024-02-01T09:15:00Z',
+        is_private: false,
+      },
+    ],
+    followups: [
+      {
+        id: '1',
+        scheduled_date: '2024-02-08T14:00:00Z',
+        status: 'scheduled',
+      },
+    ],
+    risk_score_before: 87,
+  },
+  {
+    id: '2',
+    student_id: '2',
+    type: 'tutoring',
+    title: 'Math Tutoring Program',
+    description: 'Weekly tutoring sessions to improve mathematics performance.',
+    status: 'active',
+    priority: 'medium',
+    assigned_to: 'tutor-1',
+    created_by: 'mentor-1',
+    created_date: '2024-01-28T10:30:00Z',
+    due_date: '2024-03-15T17:00:00Z',
+    notes: [
+      {
+        id: '2',
+        content: 'Student is responding well to additional support in calculus.',
+        created_by: 'tutor-1',
+        created_date: '2024-02-02T16:00:00Z',
+        is_private: false,
+      },
+    ],
+    followups: [
+      {
+        id: '2',
+        scheduled_date: '2024-02-09T15:00:00Z',
+        status: 'scheduled',
+      },
+    ],
+    risk_score_before: 76,
+  },
+];
+
+// Mock API responses
+export const mockApiResponses = {
+  dashboard: () => Promise.resolve({ data: mockDashboardMetrics }),
+  riskTrends: () => Promise.resolve({ data: mockRiskTrends }),
+  highRiskStudents: () => Promise.resolve({ 
+    data: { 
+      data: mockHighRiskStudents,
+      total: mockHighRiskStudents.length,
+      page: 1,
+      per_page: 10,
+      total_pages: 1,
+    }
+  }),
+  interventions: () => Promise.resolve({
+    data: {
+      interventions: mockInterventions,
+      count: mockInterventions.length,
+    }
+  }),
+};

@@ -1,0 +1,68 @@
+# Model Configuration
+model:
+  name: "dropout_risk_predictor"
+  type: "xgboost"  # Options: xgboost, logistic_regression, decision_tree
+  risk_thresholds:
+    low: 0.3
+    medium: 0.6
+    high: 0.8
+
+# Feature Engineering
+features:
+  academic:
+    - attendance_rate
+    - gpa
+    - gpa_trend
+    - assignment_submission_rate
+    - exam_scores
+  behavioral:
+    - lms_login_frequency
+    - late_submissions
+    - participation_score
+  engagement:
+    - forum_posts
+    - resource_access_count
+    - time_spent_hours
+  contextual:
+    - semester
+    - has_financial_aid
+    - is_part_time
+    - is_first_generation
+
+# Training Parameters
+training:
+  test_size: 0.2
+  validation_size: 0.1
+  random_state: 42
+  cv_folds: 5
+  early_stopping_rounds: 20
+  use_smote: false  # Disable SMOTE - let model learn natural distribution
+  scale_features: true  # Feature scaling
+
+# XGBoost Parameters (Final Balanced)
+xgboost:
+  max_depth: 6
+  learning_rate: 0.1
+  n_estimators: 200
+  subsample: 0.8
+  colsample_bytree: 0.8
+  min_child_weight: 1
+  gamma: 0
+  reg_alpha: 0
+  reg_lambda: 1
+  objective: "binary:logistic"
+  eval_metric: "auc"
+  scale_pos_weight: 3.23  # 11458/3542 = 3.23 to balance classes
+
+# Fairness
+fairness:
+  sensitive_attributes:
+    - gender
+    - socioeconomic_status
+    - department
+    - region
+  metrics:
+    - demographic_parity
+    - equal_opportunity
+    - equalized_odds
+  threshold: 0.1  # Maximum allowed difference

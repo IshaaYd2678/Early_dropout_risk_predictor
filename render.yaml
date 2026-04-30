@@ -32,7 +32,7 @@ services:
 
     buildCommand: |
       pip install --upgrade pip
-      pip install -r requirements.txt
+      pip install -r requirements-api.txt
       bash scripts/render_build.sh
 
     startCommand: >
@@ -117,7 +117,7 @@ services:
 
     buildCommand: |
       pip install --upgrade pip
-      pip install streamlit plotly pandas numpy pyyaml joblib scikit-learn xgboost
+      pip install -r requirements-dashboard.txt
 
     startCommand: >
       python -m streamlit run dashboard/enhanced_working_app.py

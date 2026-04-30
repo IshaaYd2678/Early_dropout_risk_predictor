@@ -43,18 +43,63 @@ st.markdown("""
 def load_data() -> pd.DataFrame:
     path = Path("data/raw/students.csv")
     if not path.exists():
-        st.error("data/raw/students.csv not found. Run: python scripts/generate_enhanced_data.py")
-        st.stop()
-    df = pd.read_csv(path)
-    return df
+        # Generate data on the fly so the dashboard works standalone
+        st.info("Generating student dataset for first run…")
+        try:
+            sys.path.insert(0, str(Path(__file__).parent.parent))
+            from scripts.generate_enhanced_data import generate_realistic_student_data
+            path.parent.mkdir(parents=True, exist_ok=True)
+            df = generate_realistic_student_data(n_students=3000)
+            df.to_csv(path, index=False)
+        except Exception:
+            # Ultimate fallback: build a minimal synthetic dataset inline
+            np.random.seed(42)
+            n = 3000
+            depts = ["Computer Science","Engineering","Business","Arts","Science"]
+            ses_opts = ["Low","Medium","High"]
+            genders = ["Male","Female","Other"]
+            regions = ["Urban","Suburban","Rural"]
+            gpa = np.clip(np.random.normal(2.8, 0.6, n), 0.5, 4.0)
+            attend = np.clip(np.random.normal(0.80, 0.12, n), 0.2, 1.0)
+            risk_base = (1 - gpa/4)*0.4 + (1 - attend)*0.3 + np.random.uniform(0, 0.3, n)
+            df = pd.DataFrame({
+                "student_id":               [f"STU{i:06d}" for i in range(n)],
+                "gender":                   np.random.choice(genders, n),
+                "department":               np.random.choice(depts, n),
+                "region":                   np.random.choice(regions, n),
+                "socioeconomic_status":     np.random.choice(ses_opts, n),
+                "semester":                 np.random.randint(1, 9, n),
+                "gpa":                      gpa.round(2),
+                "gpa_trend":                np.random.normal(0, 0.2, n).round(3),
+                "attendance_rate":          attend.round(3),
+                "assignment_submission_rate": np.clip(attend*0.9 + np.random.normal(0,0.08,n), 0.1, 1.0).round(3),
+                "exam_scores":              np.clip(gpa*20 + np.random.normal(5,10,n), 0, 100).round(1),
+                "lms_login_frequency":      np.maximum(0, np.random.poisson(12, n)),
+                "late_submissions":         np.maximum(0, np.random.poisson(3, n)),
+                "participation_score":      np.clip(np.random.normal(65,18,n), 0, 100).round(1),
+                "forum_posts":              np.maximum(0, np.random.poisson(6, n)),
+                "resource_access_count":    np.maximum(0, np.random.poisson(25, n)),
+                "time_spent_hours":         np.maximum(0, np.random.gamma(4, 3, n)).round(1),
+                "has_financial_aid":        np.random.binomial(1, 0.4, n),
+                "is_part_time":             np.random.binomial(1, 0.12, n),
+                "is_first_generation":      np.random.binomial(1, 0.25, n),
+                "dropped_out":              (risk_base > 0.55).astype(int),
+            })
+            path.parent.mkdir(parents=True, exist_ok=True)
+            df.to_csv(path, index=False)
+    return pd.read_csv(path)
 
 
 @st.cache_resource(show_spinner="Loading ML model…")
 def load_predictor():
     try:
+        model_path = Path("data/models/xgboost_model.pkl")
+        feat_path  = Path("data/models/feature_names.pkl")
+        if not model_path.exists() or not feat_path.exists():
+            return None   # graceful fallback — heuristic scoring used instead
         from ml.predict import DropoutRiskPredictor
         return DropoutRiskPredictor()
-    except Exception as e:
+    except Exception:
         return None
 
 
